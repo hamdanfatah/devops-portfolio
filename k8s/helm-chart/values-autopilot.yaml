@@ -1,0 +1,44 @@
+replicaCount: 1
+
+image:
+  repository: asia-southeast2-docker.pkg.dev/global-exchange-487402-r4/task-manager/task-manager-api
+  tag: v1
+  pullPolicy: Always
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50
+
+config:
+  SERVER_PORT: "8080"
+  ENVIRONMENT: "production"
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "taskmanager"
+  POSTGRES_SSL_MODE: "disable"
+  MONGO_URI: "mongodb://mongodb-service:27017"
+  MONGO_DB: "taskmanager"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+
+secrets:
+  POSTGRES_USER: "hamfa"
+  POSTGRES_PASSWORD: "hamfa_secret"
