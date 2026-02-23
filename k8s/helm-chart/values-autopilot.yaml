@@ -40,5 +40,5 @@ config:
   REDIS_PORT: "6379"
 
 secrets:
-  POSTGRES_USER: "hamfa"
-  POSTGRES_PASSWORD: "hamfa_secret"
+  POSTGRES_USER: "CHANGE_ME"
+  POSTGRES_PASSWORD: "CHANGE_ME"

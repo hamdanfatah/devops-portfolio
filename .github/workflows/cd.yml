@@ -71,6 +71,8 @@ jobs:
             -f ./k8s/helm-chart/values-autopilot.yaml \
             --set image.tag=${{ github.sha }} \
             --set image.repository=${IMAGE_TAG} \
+            --set secrets.POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+            --set secrets.POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
             --wait --timeout=300s
 
       # Show deployment status
