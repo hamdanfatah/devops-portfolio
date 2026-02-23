@@ -1,0 +1,11 @@
+# Example terraform.tfvars — copy to terraform.tfvars and fill in values
+project_id     = "your-gcp-project-id"
+project_name   = "task-manager"
+region         = "asia-southeast2"
+zone           = "asia-southeast2-a"
+environment    = "production"
+machine_type   = "e2-standard-2"
+min_node_count = 2
+max_node_count = 10
+db_tier        = "db-custom-2-4096"
+db_password    = "CHANGE_ME_TO_SECURE_PASSWORD"

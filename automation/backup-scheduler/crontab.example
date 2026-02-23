@@ -1,0 +1,11 @@
+# PostgreSQL Backup Scheduler
+# Add these lines to your crontab: crontab -e
+
+# Daily backup at 2:00 AM
+0 2 * * * /opt/automation/backup-scheduler/backup.sh >> /var/log/backup-scheduler.log 2>&1
+
+# Weekly full backup on Sunday at 3:00 AM
+0 3 * * 0 BACKUP_DIR=/backups/weekly /opt/automation/backup-scheduler/backup.sh >> /var/log/backup-scheduler.log 2>&1
+
+# Monthly backup on the 1st at 4:00 AM (retain for 90 days)
+0 4 1 * * RETENTION_DAYS=90 BACKUP_DIR=/backups/monthly /opt/automation/backup-scheduler/backup.sh >> /var/log/backup-scheduler.log 2>&1

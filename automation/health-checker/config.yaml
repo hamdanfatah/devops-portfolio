@@ -1,0 +1,35 @@
+# Health Checker Configuration
+# Endpoints to monitor
+
+endpoints:
+  - name: "Task Manager API"
+    url: "http://localhost:8080/health"
+    method: GET
+    timeout_seconds: 5
+    expected_status: 200
+
+  - name: "Task Manager - Tasks"
+    url: "http://localhost:8080/api/tasks"
+    method: GET
+    timeout_seconds: 5
+    expected_status: 200
+
+  - name: "Prometheus"
+    url: "http://localhost:9090/-/healthy"
+    method: GET
+    timeout_seconds: 5
+    expected_status: 200
+
+  - name: "Grafana"
+    url: "http://localhost:3000/api/health"
+    method: GET
+    timeout_seconds: 5
+    expected_status: 200
+
+# Check interval in seconds
+interval_seconds: 30
+
+# Webhook notification (Slack/Discord)
+webhook:
+  enabled: false
+  url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
