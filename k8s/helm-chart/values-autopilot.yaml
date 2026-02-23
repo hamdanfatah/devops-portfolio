@@ -42,3 +42,4 @@ config:
 secrets:
   POSTGRES_USER: "CHANGE_ME"
   POSTGRES_PASSWORD: "CHANGE_ME"
+
