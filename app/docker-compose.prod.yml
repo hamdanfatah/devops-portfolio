@@ -1,0 +1,127 @@
+# ============================================================================
+# Production Docker Compose — Optimized for GCP Free Tier (e2-micro, 1GB RAM)
+# Usage: docker compose -f docker-compose.prod.yml up -d
+# ============================================================================
+
+services:
+  # ── Application ─────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: task-manager-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - ENVIRONMENT=production
+      - GIN_MODE=release
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=hamfa
+      - POSTGRES_PASSWORD=hamfa_secret
+      - POSTGRES_DB=taskmanager
+      - POSTGRES_SSL_MODE=disable
+      - MONGO_URI=mongodb://mongodb:27017
+      - MONGO_DB=taskmanager
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+
+  # ── PostgreSQL ──────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: task-manager-postgres
+    environment:
+      POSTGRES_USER: hamfa
+      POSTGRES_PASSWORD: hamfa_secret
+      POSTGRES_DB: taskmanager
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hamfa -d taskmanager"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    command: >
+      postgres
+        -c shared_buffers=64MB
+        -c work_mem=4MB
+        -c maintenance_work_mem=32MB
+        -c effective_cache_size=128MB
+        -c max_connections=20
+
+  # ── MongoDB ─────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:7.0
+    container_name: task-manager-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    command: mongod --wiredTigerCacheSizeGB 0.15
+
+  # ── Redis ───────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: task-manager-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes --maxmemory 32mb --maxmemory-policy allkeys-lru
+    networks:
+      - app-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 48M
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge
